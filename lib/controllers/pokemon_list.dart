@@ -1,5 +1,6 @@
 import 'package:pokedex_demo/models/pokemon_basic.dart';
-import 'package:pokedex_demo/common/http_request.dart';
+// import 'package:pokedex_demo/common/http_request.dart';
+import 'package:pokedex_demo/common/http_client.dart';
 
 
 
@@ -9,15 +10,20 @@ class PokemonBasicList {
   Future<List<PokemonBasic>?> fetchNewBatch(String? url) async {
     List<PokemonBasic>? batch;
 
-    payload = await client.fetch(url ?? 'https://pokeapi.co/api/v2/pokemon/', query: {'limit': 20} ).then((val) { 
+    // await client.get('https://localhost:3000/api-sustana/v1/login');
+    try {
+      payload = await client.get(url ?? 'https://pokeapi.co/api/v2/pokemon/', query: {'limit': 20} ).then((val) { 
       batch = ((val['results'] as List).map((it) {
         var lst = (it['url'] as String).split('/');
         var id = lst[lst.length - 2];
         return PokemonBasic(id: int.parse(id), name: it['name'], imagePath: 'graphics/sprites/pokemon/$id.png', url: it['url']);
       }).toList());
 
-      return val;
     });
+    } catch(e) {
+      batch = [PokemonBasic(id: 1, name: 'reqFailure', url: '1/1/1/')];
+    }
+    
 
     return batch;
   }
